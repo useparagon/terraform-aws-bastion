@@ -322,5 +322,8 @@ resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_s3_bucket.bucket]
+  depends_on = [
+    aws_s3_bucket.bucket,
+    aws_launch_template.bastion_launch_template
+  ]
 }
