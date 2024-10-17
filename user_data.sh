@@ -1,5 +1,4 @@
 #!/bin/bash -x
-yum -y update --security
 
 ##########################
 ## ENABLE SSH RECORDING ##
@@ -8,8 +7,8 @@ yum -y update --security
 # Create a new folder for the log files
 mkdir /var/log/bastion
 
-# Allow ec2-user only to access this folder and its content
-chown ec2-user:ec2-user /var/log/bastion
+# Allow ubuntu only to access this folder and its content
+chown ubuntu:ubuntu /var/log/bastion
 chmod -R 770 /var/log/bastion
 setfacl -Rdm other:0 /var/log/bastion
 
@@ -70,7 +69,7 @@ chmod a+x /usr/bin/bastion/shell
 # 1. Add a random suffix to the log file name.
 # 2. Prevent bastion host users from listing the folder containing log files. This is done
 #    by changing the group owner of "script" and setting GID.
-chown root:ec2-user /usr/bin/script
+chown root:ubuntu /usr/bin/script
 chmod g+s /usr/bin/script
 
 # 3. Prevent bastion host users from viewing processes owned by other users, because the log
@@ -167,25 +166,6 @@ EOF
 
 chmod 700 /usr/bin/bastion/sync_users
 
-##############################
-## INSTALL SECURITY UPDATES ##
-##############################
-
-# Security updates are installed by yum. If script is updated (package util-linux)
-# then the setuid bit needs to be recovered. Otherwise clients can not loging.
-
-cat > /usr/bin/bastion/yum_update << 'EOF'
-#!/usr/bin/env bash
-
-yum -y update --security
-
-chown root:ec2-user /usr/bin/script
-chmod g+s /usr/bin/script
-
-EOF
-
-chmod 700 /usr/bin/bastion/yum_update
-
 
 ###########################################
 ## SCHEDULE SCRIPTS AND SECURITY UPDATES ##
@@ -193,7 +173,6 @@ chmod 700 /usr/bin/bastion/yum_update
 
 cat > ~/mycron << EOF
 */5 * * * * /usr/bin/bastion/sync_users
-0 0 * * * /usr/bin/bastion/yum_update
 ${sync_logs_cron_job}
 EOF
 crontab ~/mycron

@@ -15,7 +15,7 @@ data "aws_kms_alias" "kms-ebs" {
 resource "aws_s3_object" "bucket_public_keys_readme" {
   bucket     = aws_s3_bucket.bucket.id
   key        = "public-keys/README.txt"
-  content    = "Drop here the ssh public keys of the instances you want to control"
+  content    = "Drop the SSH public keys of the instances you want to control here"
   kms_key_id = aws_kms_key.key.arn
 }
 
@@ -131,7 +131,6 @@ data "aws_iam_policy_document" "bastion_host_policy_document" {
     ]
     resources = [aws_kms_key.key.arn]
   }
-
 }
 
 resource "aws_iam_policy" "bastion_host_policy" {
@@ -213,7 +212,7 @@ resource "aws_iam_instance_profile" "bastion_host_profile" {
 
 resource "aws_launch_template" "bastion_launch_template" {
   name_prefix            = local.name_prefix
-  image_id               = var.bastion_ami != "" ? var.bastion_ami : data.aws_ami.amazon-linux-2.id
+  image_id               = local.bastion_ami.id
   instance_type          = var.instance_type
   update_default_version = true
   monitoring {
@@ -238,14 +237,17 @@ resource "aws_launch_template" "bastion_launch_template" {
     sync_logs_cron_job      = var.enable_logs_s3_sync ? "*/5 * * * * /usr/bin/bastion/sync_s3" : ""
   }))
 
-  block_device_mappings {
-    device_name = "/dev/xvda"
-    ebs {
-      volume_size           = var.disk_size
-      volume_type           = "gp2"
-      delete_on_termination = true
-      encrypted             = var.disk_encrypt
-      kms_key_id            = var.disk_encrypt ? data.aws_kms_alias.kms-ebs.target_key_arn : ""
+  dynamic "block_device_mappings" {
+    for_each = local.bastion_ami.block_device_mappings
+    content {
+      device_name = block_device_mappings.value.device_name
+      ebs {
+        volume_size           = try(block_device_mappings.value.ebs.volume_size, var.disk_size)
+        volume_type           = try(block_device_mappings.value.ebs.volume_type, var.disk_type)
+        delete_on_termination = true
+        encrypted             = var.disk_encrypt
+        kms_key_id            = var.disk_encrypt ? data.aws_kms_alias.kms-ebs.target_key_arn : ""
+      }
     }
   }
 
@@ -273,7 +275,7 @@ resource "aws_launch_template" "bastion_launch_template" {
 }
 
 resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
-  name_prefix = "ASG-${local.name_prefix}"
+  name_prefix = local.name_prefix
   launch_template {
     id      = aws_launch_template.bastion_launch_template.id
     version = aws_launch_template.bastion_launch_template.latest_version
@@ -308,7 +310,7 @@ resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
 
   tag {
     key                 = "Name"
-    value               = "ASG-${local.name_prefix}"
+    value               = local.name_prefix
     propagate_at_launch = true
   }
 
@@ -320,5 +322,8 @@ resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
     create_before_destroy = true
   }
 
-  depends_on = [aws_s3_bucket.bucket]
+  depends_on = [
+    aws_s3_bucket.bucket,
+    aws_launch_template.bastion_launch_template
+  ]
 }

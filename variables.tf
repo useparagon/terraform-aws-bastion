@@ -6,7 +6,7 @@ variable "allow_ssh_commands" {
 
 variable "associate_public_ip_address" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "auto_scaling_group_subnets" {
@@ -119,6 +119,12 @@ variable "disk_size" {
   type        = number
   description = "Root EBS size in GB"
   default     = 8
+}
+
+variable "disk_type" {
+  type        = string
+  description = "EBS volume type"
+  default     = "gp3"
 }
 
 variable "elb_subnets" {
@@ -234,7 +240,8 @@ variable "public_ssh_port" {
 }
 
 variable "region" {
-  type = string
+  type        = string
+  description = "AWS region"
 }
 
 variable "tags" {
@@ -246,7 +253,7 @@ variable "tags" {
 variable "use_imds_v2" {
   type        = bool
   description = "Use (IMDSv2) Instance Metadata Service V2"
-  default     = false
+  default     = true
 }
 
 variable "vpc_id" {
