@@ -1,6 +1,6 @@
 resource "aws_kms_key" "key" {
   enable_key_rotation = var.kms_enable_key_rotation
-  tags                = merge(var.tags)
+  tags                = local.tags
 }
 
 resource "aws_kms_alias" "alias" {
@@ -25,7 +25,7 @@ resource "aws_security_group" "bastion_host_security_group" {
   name        = "${local.name_prefix}-host"
   vpc_id      = var.vpc_id
 
-  tags = merge(var.tags)
+  tags = local.tags
 }
 
 resource "aws_security_group_rule" "ingress_bastion" {
@@ -55,10 +55,10 @@ resource "aws_security_group_rule" "egress_bastion" {
 
 resource "aws_security_group" "private_instances_security_group" {
   description = "Enable SSH access to the Private instances from the bastion via SSH port"
-  name        = "${local.name_prefix}-priv-instances"
+  name        = "${local.name_prefix}-instances"
   vpc_id      = var.vpc_id
 
-  tags = merge(var.tags)
+  tags = local.tags
 }
 
 resource "aws_security_group_rule" "ingress_instances" {
@@ -165,7 +165,7 @@ resource "aws_lb" "bastion_lb" {
   subnets = var.elb_subnets
 
   load_balancer_type = "network"
-  tags               = merge(var.tags)
+  tags               = local.tags
 
   lifecycle {
     precondition {
@@ -189,7 +189,7 @@ resource "aws_lb_target_group" "bastion_lb_target_group" {
     protocol = "TCP"
   }
 
-  tags = merge(var.tags)
+  tags = local.tags
 }
 
 resource "aws_lb_listener" "bastion_lb_listener_22" {
@@ -211,7 +211,7 @@ resource "aws_iam_instance_profile" "bastion_host_profile" {
 }
 
 resource "aws_launch_template" "bastion_launch_template" {
-  name_prefix            = local.name_prefix
+  name_prefix            = var.bastion_launch_template_name
   image_id               = local.bastion_ami.id
   instance_type          = var.instance_type
   update_default_version = true
@@ -253,12 +253,12 @@ resource "aws_launch_template" "bastion_launch_template" {
 
   tag_specifications {
     resource_type = "instance"
-    tags          = merge(tomap({ "Name" = var.bastion_launch_template_name }), merge(var.tags))
+    tags          = local.tags
   }
 
   tag_specifications {
     resource_type = "volume"
-    tags          = merge(tomap({ "Name" = var.bastion_launch_template_name }), merge(var.tags))
+    tags          = local.tags
   }
 
   metadata_options {
@@ -275,7 +275,7 @@ resource "aws_launch_template" "bastion_launch_template" {
 }
 
 resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
-  name_prefix = local.name_prefix
+  name_prefix = var.bastion_launch_template_name
   launch_template {
     id      = aws_launch_template.bastion_launch_template.id
     version = aws_launch_template.bastion_launch_template.latest_version
@@ -299,19 +299,13 @@ resource "aws_autoscaling_group" "bastion_auto_scaling_group" {
   ]
 
   dynamic "tag" {
-    for_each = var.tags
+    for_each = local.tags
 
     content {
       key                 = tag.key
       value               = tag.value
       propagate_at_launch = true
     }
-  }
-
-  tag {
-    key                 = "Name"
-    value               = local.name_prefix
-    propagate_at_launch = true
   }
 
   instance_refresh {

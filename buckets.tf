@@ -1,7 +1,7 @@
 resource "aws_s3_bucket" "bucket" {
   bucket        = var.bucket_name
   force_destroy = var.bucket_force_destroy
-  tags          = merge(var.tags)
+  tags          = local.tags
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
