@@ -227,6 +227,12 @@ variable "log_standard_ia_days" {
   default     = 30
 }
 
+variable "name" {
+  type        = string
+  description = "Default name to use for resources"
+  default     = null
+}
+
 variable "private_ssh_port" {
   type        = number
   description = "Set the SSH port to use between the bastion and private instance"

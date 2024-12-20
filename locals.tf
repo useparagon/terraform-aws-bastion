@@ -1,6 +1,8 @@
 locals {
-  name_prefix    = var.bastion_launch_template_name
+  name_prefix    = coalesce(var.name, var.bastion_launch_template_name)
   security_group = join("", flatten([aws_security_group.bastion_host_security_group[*].id, var.bastion_security_group_id]))
+
+  tags = merge(tomap({ "Name" = local.name_prefix }), merge(var.tags))
 
   // the compact() function checks for null values and gets rid of them 
   // the length is a check to ensure we dont have an empty array, as an empty array would throw an error for the cidr_block argument 
