@@ -62,16 +62,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket" {
     }
 
     expiration {
-      days = var.log_expiry_days
+      days                         = var.log_expiry_days
+      expired_object_delete_marker = true
     }
 
     # Remove prior object versions after this many days to prevent unbounded growth
     noncurrent_version_expiration {
       noncurrent_days = var.log_version_days
     }
-
-    # Remove delete markers once all noncurrent versions are expired
-    expired_object_delete_marker = true
 
     # Abort incomplete multipart uploads (partial files) after this many days
     abort_incomplete_multipart_upload {
