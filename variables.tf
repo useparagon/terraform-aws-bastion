@@ -227,6 +227,18 @@ variable "log_standard_ia_days" {
   default     = 30
 }
 
+variable "log_version_days" {
+  type        = number
+  description = "Number of days before removing previous versions of logs"
+  default     = 30
+}
+
+variable "log_incomplete_multipart_days" {
+  type        = number
+  description = "Number of days after which incomplete multipart uploads (partial files) are aborted and cleaned up"
+  default     = 7
+}
+
 variable "name" {
   type        = string
   description = "Default name to use for resources"

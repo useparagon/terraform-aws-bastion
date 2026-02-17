@@ -15,17 +15,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
   }
 }
 
-resource "aws_s3_bucket_acl" "bucket" {
-  bucket = aws_s3_bucket.bucket.id
-  acl    = "private"
-
-  depends_on = [aws_s3_bucket_ownership_controls.bucket-acl-ownership]
-}
-
-resource "aws_s3_bucket_ownership_controls" "bucket-acl-ownership" {
+# Disable ACLs (recommended). Bucket remains private; only owner has access.
+resource "aws_s3_bucket_ownership_controls" "bucket" {
   bucket = aws_s3_bucket.bucket.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = "BucketOwnerEnforced"
   }
 }
 
@@ -60,6 +54,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket" {
 
     expiration {
       days = var.log_expiry_days
+    }
+
+    # Remove prior object versions after this many days to prevent unbounded growth
+    noncurrent_version_expiration {
+      noncurrent_days = var.log_version_days
+    }
+
+    # Remove delete markers once all noncurrent versions are expired
+    expired_object_delete_marker = true
+
+    # Abort incomplete multipart uploads (partial files) after this many days
+    abort_incomplete_multipart_upload {
+      days_after_initiation = var.log_incomplete_multipart_days
     }
   }
 }
