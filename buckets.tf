@@ -62,8 +62,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket" {
     }
 
     expiration {
-      days                         = var.log_expiry_days
-      expired_object_delete_marker = true
+      days = var.log_expiry_days
     }
 
     # Remove prior object versions after this many days to prevent unbounded growth
@@ -74,6 +73,20 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket" {
     # Abort incomplete multipart uploads (partial files) after this many days
     abort_incomplete_multipart_upload {
       days_after_initiation = var.log_incomplete_multipart_days
+    }
+  }
+
+  # Remove delete markers once all noncurrent versions are expired (separate rule: expiration allows only one of days/date/expired_object_delete_marker)
+  rule {
+    id     = "log-delete-markers"
+    status = var.enable_logs_s3_sync && var.log_auto_clean ? "Enabled" : "Disabled"
+
+    filter {
+      prefix = "logs/"
+    }
+
+    expiration {
+      expired_object_delete_marker = true
     }
   }
 }
