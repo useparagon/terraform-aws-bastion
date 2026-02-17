@@ -62,14 +62,14 @@ module "bastion" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.4 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.71.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0 |
 
 ## Modules
 
@@ -92,9 +92,9 @@ No modules.
 | [aws_lb_target_group.bastion_lb_target_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 | [aws_route53_record.bastion_record_name](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_s3_bucket.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
-| [aws_s3_bucket_acl.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_acl) | resource |
 | [aws_s3_bucket_lifecycle_configuration.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
-| [aws_s3_bucket_ownership_controls.bucket-acl-ownership](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
+| [aws_s3_bucket_ownership_controls.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
+| [aws_s3_bucket_public_access_block.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_server_side_encryption_configuration.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
 | [aws_s3_bucket_versioning.bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_s3_object.bucket_public_keys_readme](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) | resource |
@@ -103,7 +103,7 @@ No modules.
 | [aws_security_group_rule.egress_bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress_bastion](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.ingress_instances](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
-| [aws_ami.amazon_linux_2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ami.amazon_linux](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_ami.custom_ami](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_iam_policy_document.assume_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.bastion_host_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
@@ -127,6 +127,7 @@ No modules.
 | <a name="input_bastion_launch_template_name"></a> [bastion\_launch\_template\_name](#input\_bastion\_launch\_template\_name) | Bastion Launch template Name, will also be used for the ASG | `string` | `"bastion-lt"` | no |
 | <a name="input_bastion_record_name"></a> [bastion\_record\_name](#input\_bastion\_record\_name) | DNS record name to use for the bastion | `string` | `""` | no |
 | <a name="input_bastion_security_group_id"></a> [bastion\_security\_group\_id](#input\_bastion\_security\_group\_id) | Custom security group to use | `string` | `""` | no |
+| <a name="input_bastion_ssh_user"></a> [bastion\_ssh\_user](#input\_bastion\_ssh\_user) | Default SSH user for the bastion AMI (e.g. ec2-user for Amazon Linux, ubuntu for Ubuntu) | `string` | `"ubuntu"` | no |
 | <a name="input_bucket_force_destroy"></a> [bucket\_force\_destroy](#input\_bucket\_force\_destroy) | The bucket and all objects should be destroyed when using true | `bool` | `false` | no |
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | Bucket name where the bastion will store the logs | `string` | n/a | yes |
 | <a name="input_bucket_versioning"></a> [bucket\_versioning](#input\_bucket\_versioning) | Enable bucket versioning or not | `bool` | `true` | no |
@@ -151,7 +152,9 @@ No modules.
 | <a name="input_log_auto_clean"></a> [log\_auto\_clean](#input\_log\_auto\_clean) | Enable or disable the lifecycle | `bool` | `false` | no |
 | <a name="input_log_expiry_days"></a> [log\_expiry\_days](#input\_log\_expiry\_days) | Number of days before logs expiration | `number` | `90` | no |
 | <a name="input_log_glacier_days"></a> [log\_glacier\_days](#input\_log\_glacier\_days) | Number of days before moving logs to Glacier | `number` | `60` | no |
+| <a name="input_log_incomplete_multipart_days"></a> [log\_incomplete\_multipart\_days](#input\_log\_incomplete\_multipart\_days) | Number of days after which incomplete multipart uploads (partial files) are aborted and cleaned up | `number` | `7` | no |
 | <a name="input_log_standard_ia_days"></a> [log\_standard\_ia\_days](#input\_log\_standard\_ia\_days) | Number of days before moving logs to IA Storage | `number` | `30` | no |
+| <a name="input_log_version_days"></a> [log\_version\_days](#input\_log\_version\_days) | Number of days before removing previous versions of logs | `number` | `30` | no |
 | <a name="input_name"></a> [name](#input\_name) | Default name to use for resources | `string` | `null` | no |
 | <a name="input_private_ssh_port"></a> [private\_ssh\_port](#input\_private\_ssh\_port) | Set the SSH port to use between the bastion and private instance | `number` | `22` | no |
 | <a name="input_public_ssh_port"></a> [public\_ssh\_port](#input\_public\_ssh\_port) | Set the SSH port to use from desktop to the bastion | `number` | `22` | no |

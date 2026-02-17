@@ -1,7 +1,7 @@
-data "aws_ami" "amazon_linux_2" {
+data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
-  name_regex  = "^amzn2-ami-hvm.*-ebs"
+  name_regex  = "^al2023-ami-.*-x86_64"
 
   filter {
     name   = "architecture"
@@ -18,7 +18,7 @@ data "aws_ami" "custom_ami" {
 }
 
 locals {
-  bastion_ami = var.bastion_ami == "" ? data.aws_ami.amazon_linux_2 : data.aws_ami.custom_ami[0]
+  bastion_ami = var.bastion_ami == "" ? data.aws_ami.amazon_linux : data.aws_ami.custom_ami[0]
 }
 
 data "aws_subnet" "subnets" {

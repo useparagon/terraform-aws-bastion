@@ -96,8 +96,7 @@ data "aws_iam_policy_document" "bastion_host_policy_document" {
 
   statement {
     actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
+      "s3:PutObject"
     ]
     resources = ["${aws_s3_bucket.bucket.arn}/logs/*"]
   }
@@ -234,6 +233,7 @@ resource "aws_launch_template" "bastion_launch_template" {
     extra_user_data_content = var.extra_user_data_content
     allow_ssh_commands      = lower(var.allow_ssh_commands)
     public_ssh_port         = var.public_ssh_port
+    bastion_ssh_user        = var.bastion_ssh_user
     sync_logs_cron_job      = var.enable_logs_s3_sync ? "*/5 * * * * /usr/bin/bastion/sync_s3" : ""
   }))
 

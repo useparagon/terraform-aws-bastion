@@ -72,6 +72,12 @@ variable "bastion_security_group_id" {
   default     = ""
 }
 
+variable "bastion_ssh_user" {
+  type        = string
+  description = "Default SSH user for the bastion AMI (e.g. ec2-user for Amazon Linux, ubuntu for Ubuntu)"
+  default     = "ubuntu"
+}
+
 variable "bucket_force_destroy" {
   type        = bool
   default     = false
@@ -225,6 +231,18 @@ variable "log_standard_ia_days" {
   type        = number
   description = "Number of days before moving logs to IA Storage"
   default     = 30
+}
+
+variable "log_version_days" {
+  type        = number
+  description = "Number of days before removing previous versions of logs"
+  default     = 30
+}
+
+variable "log_incomplete_multipart_days" {
+  type        = number
+  description = "Number of days after which incomplete multipart uploads (partial files) are aborted and cleaned up"
+  default     = 7
 }
 
 variable "name" {
