@@ -7,8 +7,8 @@
 # Create a new folder for the log files
 mkdir /var/log/bastion
 
-# Allow ubuntu only to access this folder and its content
-chown ubuntu:ubuntu /var/log/bastion
+# Allow the bastion SSH user only to access this folder and its content
+chown ${bastion_ssh_user}:${bastion_ssh_user} /var/log/bastion
 chmod -R 770 /var/log/bastion
 setfacl -Rdm other:0 /var/log/bastion
 
@@ -69,7 +69,7 @@ chmod a+x /usr/bin/bastion/shell
 # 1. Add a random suffix to the log file name.
 # 2. Prevent bastion host users from listing the folder containing log files. This is done
 #    by changing the group owner of "script" and setting GID.
-chown root:ubuntu /usr/bin/script
+chown root:${bastion_ssh_user} /usr/bin/script
 chmod g+s /usr/bin/script
 
 # 3. Prevent bastion host users from viewing processes owned by other users, because the log

@@ -72,6 +72,12 @@ variable "bastion_security_group_id" {
   default     = ""
 }
 
+variable "bastion_ssh_user" {
+  type        = string
+  description = "Default SSH user for the bastion AMI (e.g. ec2-user for Amazon Linux, ubuntu for Ubuntu)"
+  default     = "ubuntu"
+}
+
 variable "bucket_force_destroy" {
   type        = bool
   default     = false
