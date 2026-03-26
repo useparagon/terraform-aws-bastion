@@ -149,10 +149,10 @@ No modules.
 | <a name="input_ipv6_cidrs"></a> [ipv6\_cidrs](#input\_ipv6\_cidrs) | List of IPv6 CIDRs that can access the bastion. Default: ::/0 | `list(string)` | <pre>[<br/>  "::/0"<br/>]</pre> | no |
 | <a name="input_is_lb_private"></a> [is\_lb\_private](#input\_is\_lb\_private) | If TRUE, the load balancer scheme will be "internal" else "internet-facing" | `bool` | `null` | no |
 | <a name="input_kms_enable_key_rotation"></a> [kms\_enable\_key\_rotation](#input\_kms\_enable\_key\_rotation) | Enable key rotation for the KMS key | `bool` | `false` | no |
-| <a name="input_log_auto_clean"></a> [log\_auto\_clean](#input\_log\_auto\_clean) | Enable or disable the lifecycle | `bool` | `false` | no |
+| <a name="input_log_auto_clean"></a> [log\_auto\_clean](#input\_log\_auto\_clean) | Enable or disable the lifecycle | `bool` | `true` | no |
 | <a name="input_log_expiry_days"></a> [log\_expiry\_days](#input\_log\_expiry\_days) | Number of days before logs expiration | `number` | `90` | no |
 | <a name="input_log_glacier_days"></a> [log\_glacier\_days](#input\_log\_glacier\_days) | Number of days before moving logs to Glacier | `number` | `60` | no |
-| <a name="input_log_incomplete_multipart_days"></a> [log\_incomplete\_multipart\_days](#input\_log\_incomplete\_multipart\_days) | Number of days after which incomplete multipart uploads (partial files) are aborted and cleaned up | `number` | `7` | no |
+| <a name="input_log_incomplete_multipart_days"></a> [log\_incomplete\_multipart\_days](#input\_log\_incomplete\_multipart\_days) | Number of days after which incomplete multipart uploads (partial files) are aborted and cleaned up | `number` | `1` | no |
 | <a name="input_log_standard_ia_days"></a> [log\_standard\_ia\_days](#input\_log\_standard\_ia\_days) | Number of days before moving logs to IA Storage | `number` | `30` | no |
 | <a name="input_log_version_days"></a> [log\_version\_days](#input\_log\_version\_days) | Number of days before removing previous versions of logs | `number` | `30` | no |
 | <a name="input_name"></a> [name](#input\_name) | Default name to use for resources | `string` | `null` | no |
