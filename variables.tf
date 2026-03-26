@@ -212,7 +212,7 @@ variable "kms_enable_key_rotation" {
 variable "log_auto_clean" {
   type        = bool
   description = "Enable or disable the lifecycle"
-  default     = false
+  default     = true
 }
 
 variable "log_expiry_days" {
@@ -242,7 +242,7 @@ variable "log_version_days" {
 variable "log_incomplete_multipart_days" {
   type        = number
   description = "Number of days after which incomplete multipart uploads (partial files) are aborted and cleaned up"
-  default     = 7
+  default     = 1
 }
 
 variable "name" {
