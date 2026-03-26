@@ -113,7 +113,8 @@ data "aws_iam_policy_document" "bastion_host_policy_document" {
       "s3:ListBucket"
     ]
     resources = [
-    aws_s3_bucket.bucket.arn]
+      aws_s3_bucket.bucket.arn
+    ]
 
     condition {
       test     = "ForAnyValue:StringEquals"
@@ -124,9 +125,10 @@ data "aws_iam_policy_document" "bastion_host_policy_document" {
 
   statement {
     actions = [
-
+      "kms:Decrypt",
+      "kms:DescribeKey",
       "kms:Encrypt",
-      "kms:Decrypt"
+      "kms:GenerateDataKey"
     ]
     resources = [aws_kms_key.key.arn]
   }
@@ -159,7 +161,7 @@ resource "aws_lb" "bastion_lb" {
   count = var.create_elb ? 1 : 0
 
   internal = var.is_lb_private
-  name     = "${local.name_prefix}-lb"
+  name     = local.lb_name
 
   subnets = var.elb_subnets
 
@@ -177,7 +179,7 @@ resource "aws_lb" "bastion_lb" {
 resource "aws_lb_target_group" "bastion_lb_target_group" {
   count = var.create_elb ? 1 : 0
 
-  name        = "${local.name_prefix}-lb-target"
+  name        = local.lb_target_group_name
   port        = var.public_ssh_port
   protocol    = "TCP"
   vpc_id      = var.vpc_id
